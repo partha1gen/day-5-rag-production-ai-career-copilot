@@ -63,10 +63,11 @@ class ResumeModel {
 
       const results = await collection.query({
         queryEmbeddings: [queryEmbedding],
-        nResults: 10,
+        nResults: 5,
       });
-
-      return results.metadatas[0];
+      console.log(results);
+      //return results.metadatas[0];
+      return results;
     } catch (e) {
       throw new Error("from query emdedding", { cause: e.message });
     }

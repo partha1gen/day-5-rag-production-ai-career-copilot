@@ -6,9 +6,12 @@ function App() {
   const [statusText, setStatusText] = useState(null);
   const [query, setQuery] = useState(null);
   const [searchtresult, setSearchResult] = useState([]);
+  const [question, setQuestion] = useState(null);
+  const [questionAnswer, setQuestionAnswer] = useState(null);
 
   const uploadResume = async () => {
-    const url = "http://localhost:3000/upload-resume";
+    const url = "http://localhost:3000/upload-document-rag";
+    //const url = "http://localhost:3000/upload-resume";
     const formData = new FormData();
     setStatusText(" ");
     formData.append("resume", file);
@@ -32,6 +35,18 @@ function App() {
       });
       console.log(response.data);
       setSearchResult(response.data.serachResults);
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  const handleQuestion = async () => {
+    try {
+      const response = await axios.post("http://localhost:3000/chat", {
+        question,
+      });
+      //console.log(response.data);
+      setQuestionAnswer(response.data);
     } catch (e) {
       alert(e.message);
     }
@@ -61,6 +76,19 @@ function App() {
         </ul>
       )}
       {!(searchtresult.length > 0) && <p>no result to display</p>}
+      <textarea
+        value={question}
+        onChange={(e) => setQuestion(e.target.value)}
+      />
+      <button onClick={handleQuestion}>Send question</button>
+      {questionAnswer && <div>{questionAnswer.answer}</div>}
+      {questionAnswer && (
+        <ul>
+          {questionAnswer.sources.map((item) => {
+            return <li>{item.fileName}</li>;
+          })}
+        </ul>
+      )}
     </>
   );
 }
