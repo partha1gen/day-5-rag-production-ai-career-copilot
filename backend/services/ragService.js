@@ -1,5 +1,5 @@
 import { openAiClient } from "../utils/openai.js";
-export const ragAnalyzer = async (context, question) => {
+export const ragAnalyzer = async (context, question, existingmsg) => {
   try {
     const prompt = `
                     Answer using ONLY
@@ -13,15 +13,15 @@ export const ragAnalyzer = async (context, question) => {
 
                     ${question}
                     `;
+    existingmsg.push({
+      role: "user",
+      content: prompt,
+    });
+    console.log("existv:", existingmsg);
     const response = await openAiClient.chat.completions.create({
       model: "gpt-5.5",
 
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+      messages: existingmsg,
     });
     return response;
   } catch (e) {

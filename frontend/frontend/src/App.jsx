@@ -1,6 +1,8 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
+
 function App() {
   const [file, setFile] = useState(null);
   const [statusText, setStatusText] = useState(null);
@@ -9,6 +11,16 @@ function App() {
   const [question, setQuestion] = useState("");
   const [questionAnswer, setQuestionAnswer] = useState(null);
   const [documentType, setDocumentType] = useState("resume");
+  const [sessionId] = useState(() => {
+    let existingSessionId = localStorage.getItem("sessionId");
+
+    if (!existingSessionId) {
+      existingSessionId = uuidv4();
+
+      localStorage.setItem("sessionId", existingSessionId);
+    }
+    return existingSessionId;
+  });
 
   const uploadResume = async (e) => {
     const urlTarget = e.target.dataset.info;
@@ -49,13 +61,14 @@ function App() {
       }
       const response = await axios.post(url, {
         queryString,
+        sessionId,
       });
       console.log(response.data);
       if (urlTarget === "resume-search")
         setSearchResult(response.data.serachResults);
       else if (urlTarget === "pdf-chat") setQuestionAnswer(response.data);
     } catch (e) {
-      alert(e.message);
+      alert(e.message, e.cause);
     }
   };
 
@@ -106,6 +119,7 @@ function App() {
       <button data-info="pdf-chat" onClick={handlesearch}>
         Send question
       </button>
+      <div>Session: {sessionId}</div>
       {questionAnswer && <div>{questionAnswer.answer}</div>}
       {questionAnswer && (
         <ul>
