@@ -55,7 +55,7 @@ class ResumeModel {
     }
   }
 
-  async queryEmbeddingFromSearch(text) {
+  async queryEmbeddingFromSearch(text, rag = false) {
     try {
       const queryEmbedding = await generateEmbedding(text);
 
@@ -66,8 +66,10 @@ class ResumeModel {
         nResults: 5,
       });
       console.log(results);
-      //return results.metadatas[0];
-      return results;
+      if (rag) {
+        return results;
+      }
+      return results.metadatas[0];
     } catch (e) {
       throw new Error("from query emdedding", { cause: e.message });
     }

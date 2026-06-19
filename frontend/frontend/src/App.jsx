@@ -4,14 +4,20 @@ import axios from "axios";
 function App() {
   const [file, setFile] = useState(null);
   const [statusText, setStatusText] = useState(null);
-  const [query, setQuery] = useState(null);
+  const [query, setQuery] = useState("");
   const [searchtresult, setSearchResult] = useState([]);
-  const [question, setQuestion] = useState(null);
+  const [question, setQuestion] = useState("");
   const [questionAnswer, setQuestionAnswer] = useState(null);
 
-  const uploadResume = async () => {
-    const url = "http://localhost:3000/upload-document-rag";
-    //const url = "http://localhost:3000/upload-resume";
+  const uploadResume = async (e) => {
+    const urlTarget = e.target.dataset.info;
+    let url;
+    if (urlTarget === "pdf-chat") {
+      url = "http://localhost:3000/pdf-chat/upload-document";
+    } else if (urlTarget === "resume-search") {
+      url = "http://localhost:3000/resume-search/upload-resume";
+    }
+
     const formData = new FormData();
     setStatusText(" ");
     formData.append("resume", file);
@@ -28,29 +34,29 @@ function App() {
     }
   };
 
-  const handlesearch = async () => {
+  const handlesearch = async (e) => {
     try {
-      const response = await axios.post("http://localhost:3000/search", {
-        query,
+      const urlTarget = e.target.dataset.info;
+      let url, queryString;
+      if (urlTarget === "pdf-chat") {
+        queryString = question;
+        url = "http://localhost:3000/pdf-chat/chat";
+      } else if (urlTarget === "resume-search") {
+        queryString = query;
+        url = "http://localhost:3000/resume-search/search";
+      }
+      const response = await axios.post(url, {
+        queryString,
       });
       console.log(response.data);
-      setSearchResult(response.data.serachResults);
+      if (urlTarget === "resume-search")
+        setSearchResult(response.data.serachResults);
+      else if (urlTarget === "pdf-chat") setQuestionAnswer(response.data);
     } catch (e) {
       alert(e.message);
     }
   };
 
-  const handleQuestion = async () => {
-    try {
-      const response = await axios.post("http://localhost:3000/chat", {
-        question,
-      });
-      //console.log(response.data);
-      setQuestionAnswer(response.data);
-    } catch (e) {
-      alert(e.message);
-    }
-  };
   return (
     <>
       <input
@@ -58,7 +64,12 @@ function App() {
         accept="*.pdf"
         onChange={(e) => setFile(e.target.files[0])}
       />
-      <button onClick={uploadResume}>upload</button>
+      <button data-info="resume-search" onClick={uploadResume}>
+        upload resume
+      </button>
+      <button data-info="pdf-chat" onClick={uploadResume}>
+        upload resume and pdf chat with rag
+      </button>
       <input
         type="text"
         value={query}
@@ -66,7 +77,9 @@ function App() {
           setQuery(e.target.value);
         }}
       />
-      <button onClick={handlesearch}>search</button>
+      <button data-info="resume-search" onClick={handlesearch}>
+        search
+      </button>
       {statusText && <p>{statusText}</p>}
       {searchtresult.length > 0 && (
         <ul>
@@ -80,7 +93,9 @@ function App() {
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
       />
-      <button onClick={handleQuestion}>Send question</button>
+      <button data-info="pdf-chat" onClick={handlesearch}>
+        Send question
+      </button>
       {questionAnswer && <div>{questionAnswer.answer}</div>}
       {questionAnswer && (
         <ul>

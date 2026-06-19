@@ -3,12 +3,15 @@ import { ragAnalyzer } from "../services/ragService.js";
 
 export const questionChat = async (req, res) => {
   console.log(req.body);
-  if (!req.body?.question) {
+  if (!req.body?.queryString) {
     return res.status(400).json({ message: "question param not present" });
   }
-  const searchText = req.body.question;
+  const searchText = req.body.queryString;
   console.log(searchText);
-  const serachResults = await ResumeModel.queryEmbeddingFromSearch(searchText);
+  const serachResults = await ResumeModel.queryEmbeddingFromSearch(
+    searchText,
+    true,
+  );
   console.log("results:,,,,--", serachResults);
   //build context
   const context = serachResults.documents[0].join("\n");
