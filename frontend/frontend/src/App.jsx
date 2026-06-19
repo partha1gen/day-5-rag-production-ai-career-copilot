@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
@@ -44,7 +44,7 @@ function App() {
         setStatusText("error in upload");
       }
     } catch (e) {
-      setStatusText("error in upload");
+      setStatusText("error in upload" + e.message);
     }
   };
 
