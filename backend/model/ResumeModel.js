@@ -33,7 +33,6 @@ class ResumeModel {
     documentType,
   ) {
     try {
-      console.log("pagenumber is:", pageNumber);
       const uniqueId = crypto.randomUUID();
 
       const collection = await getCollection();
@@ -54,7 +53,6 @@ class ResumeModel {
         ],
         documents: [text],
       });
-      console.log(resp);
       const finalCount = await collection.count();
       console.log(
         `Success: Added ${finalCount - initialCount} item(s).`,
@@ -79,7 +77,6 @@ class ResumeModel {
         },
         nResults: 5,
       });
-      console.log(results);
       if (rag) {
         return results;
       }

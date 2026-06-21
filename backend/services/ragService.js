@@ -17,7 +17,6 @@ export const ragAnalyzer = async (context, question, existingmsg) => {
       role: "user",
       content: prompt,
     });
-    console.log("existv:", existingmsg);
     const response = await openAiClient.chat.completions.create({
       model: "gpt-5.5",
 
